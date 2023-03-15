@@ -1,13 +1,13 @@
-#include "simbolos.h"
-#include "definiciones.h"
-#include "abb.h"
+#include "symbols.h"
+#include "defs.h"
+#include "binTree.h"
 
 /*
 * table: arbol de busqueda binario para tabla de simbolos
 * row: componentes reconocidos por el compilador
 */
-abb table;
-tipoelem row[] = {
+binTree table;
+lexComp row[] = {
 	{"identificador", ID},
 	{"import", IMPORT},
 	{"string", STRING},
@@ -26,7 +26,7 @@ tipoelem row[] = {
 *	Inserta simbolos reconocidos por el compilador
 */
 void initTable() {
-	crear(&table);
+	treeCreate(&table);
 
 	for (int i = 0; i < 10; i++)
 		insertSymbol(row[i]);
@@ -37,16 +37,16 @@ void initTable() {
 *	Libera memoria de la tabla
 */
 void destroyTable() {
-	destruir(table);
+	treeDestroy(table);
 }
 
 /*
-* Insertar row en abb table
+* Insertar row en binTree table
 *	@param row: elemento a añadir en la tabla
 */
-void insertSymbol(tipoelem row) {
+void insertSymbol(lexComp row) {
 	//Simbolo a crear
-	tipoelem s;
+	lexComp s;
 
 	// Reservar memoria y copiar informacion lexema
 	s.lex = (char*)malloc(sizeof(char) * (strlen(row.lex) + 1));

@@ -139,23 +139,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="abb.c" />
-    <ClCompile Include="definiciones.c" />
-    <ClCompile Include="entrada.c" />
-    <ClCompile Include="errores.c" />
-    <ClCompile Include="lexico.c" />
+    <ClCompile Include="binTree.c" />
+    <ClCompile Include="defs.c" />
+    <ClCompile Include="input.c" />
+    <ClCompile Include="errorHandler.c" />
+    <ClCompile Include="lexer.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="simbolos.c" />
-    <ClCompile Include="sintaxis.c" />
+    <ClCompile Include="symbols.c" />
+    <ClCompile Include="syntax.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="abb.h" />
-    <ClInclude Include="definiciones.h" />
-    <ClInclude Include="entrada.h" />
-    <ClInclude Include="errores.h" />
-    <ClInclude Include="lexico.h" />
-    <ClInclude Include="simbolos.h" />
-    <ClInclude Include="sintaxis.h" />
+    <ClInclude Include="binTree.h" />
+    <ClInclude Include="defs.h" />
+    <ClInclude Include="input.h" />
+    <ClInclude Include="errorHandler.h" />
+    <ClInclude Include="lexer.h" />
+    <ClInclude Include="symbols.h" />
+    <ClInclude Include="syntax.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

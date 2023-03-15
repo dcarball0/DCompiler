@@ -18,48 +18,48 @@
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sintaxis.c">
+    <ClCompile Include="syntax.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="definiciones.c">
+    <ClCompile Include="defs.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="entrada.c">
+    <ClCompile Include="input.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="errores.c">
+    <ClCompile Include="errorHandler.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lexico.c">
+    <ClCompile Include="lexer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="abb.c">
+    <ClCompile Include="binTree.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="simbolos.c">
+    <ClCompile Include="symbols.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="simbolos.h">
+    <ClInclude Include="symbols.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sintaxis.h">
+    <ClInclude Include="syntax.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="definiciones.h">
+    <ClInclude Include="defs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="entrada.h">
+    <ClInclude Include="input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="errores.h">
+    <ClInclude Include="errorHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lexico.h">
+    <ClInclude Include="lexer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="abb.h">
+    <ClInclude Include="binTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

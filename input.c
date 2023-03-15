@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h> 
-#include "errores.h"
+#include "errorHandler.h"
 
 /*
 * Definiciones
@@ -41,7 +41,7 @@ CENTINELA c;
 /*
 *	Inicialización Sistema de entrada
 */
-void init() {
+void initInput() {
 	// Inicializar estructura centinela
 	c.start = 0;
 	c.end = 0;
@@ -128,7 +128,5 @@ char nextChar() {
 	else
 	{
 		c.end++;
-	}
-
-	
+	}	
 }
