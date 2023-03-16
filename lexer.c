@@ -3,6 +3,88 @@
 #include "defs.h"
 #include <ctype.h>
 #include "symbols.h"
+/*
+*  RECONOCIMIENTO DE FLOATS
+*/
+// Flotantes 1.XXXX
+void doFloating(char nC) {
+
+	if (nC == '.') {
+		// Avanzar hasta que se acabe el float
+		// o encontrar exponente
+		// 1.0_00 ---- 1.0_00e...
+		nC = nextChar();
+		while (isdigit(nC) || nC == '_')
+		{
+			nC = nextChar();
+		}
+
+		// Encontramos exponente
+		// Buscar patron 1.123e+12_3 1.123e-1 1.123e2
+		if (nC == 'e' || nC == 'E') {
+			// 1.0_00e
+			nC = nextChar();
+			if (nC == '+' || nC == '-' || isdigit(nC))
+			{
+				// 1.0_00+
+				nC = nextChar();
+				while (isdigit(nC) || nC == '_')
+				{
+					nC = nextChar();
+				}
+				// 1.0_00+12_3
+			}
+			else
+			{
+				// TODO: Handler error float mal formado
+			}
+		}
+		else
+		{
+			// TODO: Handler error float mal formado
+		}
+	}
+	else if (nC == 'e' || nC == 'E') {
+		// Encontramos exponente
+		// Buscar patron 1e+12_3 1e-1 1e2
+		// 1.0_00e
+		nC = nextChar();
+		if (nC == '+' || nC == '-' || isdigit(nC))
+		{
+			// 1e+ 1e0
+			nC = nextChar();
+			while (isdigit(nC) || nC == '_')
+			{
+				nC = nextChar();
+			}
+			// 1e+12_3
+		}
+		else
+		{
+			// TODO: Handler error float mal formado
+		}
+	}
+}
+
+void doInteger(char nC) {
+	// Leer entero 012312_3123 hasta que no sea digito
+	while (isdigit(nC) || nC == '_')
+	{
+		nC = nextChar();
+	}
+	// Retroceder un caracter para poder leerlo bien 
+	returnPointer();
+}
+
+void doBinary(char nC) {
+	// Leer entero 012312_3123 hasta que no sea digito
+	while (nC == '0' || nC == '1' || nC == '_')
+	{
+		nC = nextChar();
+	}
+	// Retroceder un caracter para poder leerlo bien 
+	returnPointer();
+}
 
 /*
 * Automata que devuelve el siguiente componente lexico
@@ -42,7 +124,7 @@ int nextLexComp(lexComp* comp) {
 					comp->id = nC;
 					// Copiar lexema a componente
 					getLex(comp);
-					// Aceptar cadenaúú
+					// Aceptar cadena
 					accept = 1;
 				}
 				// Si es un identificador
@@ -320,9 +402,73 @@ int nextLexComp(lexComp* comp) {
 			* CASO Numeros - Comprobar tipo
 			*/
 			case 5:
-				// Obtener siguiente caracter
-				nC = nextChar();
-				comp->id = DINT;
+				// Preasignamos a int
+				comp->id = DINTEGER;
+				// Si empieza por 0 puede ser binario
+				if (nC == '0')
+				{
+					// Si el siguiente caracter es b o B es binario 100%
+					nC = nextChar();
+					if (nC == 'b' || nC == 'B')
+					{
+						nC = nextChar();
+
+						doBinary(nC);
+
+						getLex(comp);
+					}
+					// 0. es float
+					else if (nC == '.') {
+						doFloating(nC);
+
+						getLex(comp);
+					}
+					// 0 solo o 0123 o 0123.
+					else
+					{
+						doInteger(nC);
+
+						getLex(comp);
+					}
+				}
+				// Si no es binario y no es float de 0.
+				// Puede ser entero o float de x.
+				else
+				{
+					// Avanzar hasta que se acabe el numero o su parte entera
+					nC = nextChar();
+
+					bool endInt;
+					endInt = false;
+
+					while (!endInt)
+					{
+						// Parte entera
+						while (isdigit(nC) || nC == '_') {
+							nC = nextChar();
+						}
+						// Es float
+						if (nC == '.' || nC == 'e' || nC == 'E')
+						{
+							// Establecer id como tipo flotante
+							comp->id = DFLOATING;
+							// Acabamos parte entera
+							endInt = true;
+
+							doFloating(nC);
+						}
+						// Es entero
+						else
+						{
+							endInt = true;
+						}
+					}
+
+					// Retroceder un caracter para poder leerlo bien 
+					returnPointer();
+					getLex(comp);
+				}
+				
 				accept = 1;
 				break;
 		}

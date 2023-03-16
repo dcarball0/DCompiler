@@ -21,7 +21,8 @@ lexComp symbols[] = {
 	{"foreach", DFOREACH},
 	{"return", DRETURN},
 	{"void", DVOID},
-	{"cast", DCAST}
+	{"cast", DCAST},
+	{"if", DIF}
 };
 
 /*
@@ -30,10 +31,13 @@ lexComp symbols[] = {
 *	Inserta simbolos reconocidos por el compilador
 */
 void initTable() {
-	int nRows = sizeof(symbols) / sizeof(symbols[0]);
+	// Numero de simbolos
+	int nSymbols = sizeof(symbols) / sizeof(symbols[0]);
+	// Crear tabla simbolos
 	treeCreate(&table);
 
-	for (int i = 0; i < nRows; i++)
+	// Popular tabla simbolos
+	for (int i = 0; i < nSymbols; i++)
 		treeInsert(&table, symbols[i]);
 }
 
@@ -45,10 +49,17 @@ void destroyTable() {
 	treeDestroy(&table);
 }
 
+/*
+* Recuperar id a partir de lexema
+*	@param lex: Componente lexico del cual necesitamos rellenar el identificador
+*/
 void getID(lexComp* lex) {
+	// Comprobamos si el lexema existe en la tabla
 	if (treeIsMember(table, *lex)) {
+		// Buscar nodo en la tabla de simbolos
 		lexComp s;
 		treeNodeSearch(table, lex->lex, &s);
+		// Asignar 
 		lex->id = s.id;
 	}
 }

@@ -140,7 +140,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="binTree.c" />
-    <ClCompile Include="defs.c" />
     <ClCompile Include="input.c" />
     <ClCompile Include="errorHandler.c" />
     <ClCompile Include="lexer.c" />

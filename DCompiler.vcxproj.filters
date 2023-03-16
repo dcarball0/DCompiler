@@ -21,9 +21,6 @@
     <ClCompile Include="syntax.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="defs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="input.c">
       <Filter>Source Files</Filter>
     </ClCompile>

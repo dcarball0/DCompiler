@@ -82,13 +82,18 @@ void treeInsert(binTree *A, lexComp E) {
         // Asignar memoria a la celda
         *A = (binTree) malloc(sizeof (struct celda));
 
-        //Asignar memoria al lexema y \0 y copiar datos
-        (*A)->info.lex = (char*)malloc(sizeof(char) * (strlen(E.lex) + 1));
-        strcpy((*A)->info.lex, E.lex);
-
         if (*A) {
+            //Asignar memoria al lexema y \0 y copiar datos
+            (*A)->info.lex = (char*)malloc(sizeof(char) * (strlen(E.lex) + 1));
+            if ((*A)->info.lex)
+            {
+                strcpy((*A)->info.lex, E.lex);
+            }
             // Poner fin de string
-            (*A)->info.lex[strlen(E.lex)] = '\0';
+            if ((*A)->info.lex)
+            {
+                (*A)->info.lex[strlen(E.lex)] = '\0';
+            }
             (*A)->info.id = E.id;
             (*A)->treeL = NULL;
             (*A)->treeR = NULL;

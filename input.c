@@ -88,6 +88,9 @@ void loadBlock() {
 	
 	// Sumar el numero de caracteres leidos a la posicion
 	inPos += (int)fread(c.block[c.curBlock], sizeof(char), N, in);
+
+	// Para cuando
+	c.block[c.curBlock][inPos-oldInPos] = EOF;
 }
 
 /*
@@ -170,7 +173,7 @@ void restartPointers() {
 void getLex(lexComp *lex) {
 	// Tamaño lexema
 	int lexSize;
-	lexSize = 0;
+	lexSize = 1;
 
 	// Obtener lexema a partir de id (reemplazar cadena por STRING)
 	switch (lex->id)
@@ -178,9 +181,15 @@ void getLex(lexComp *lex) {
 		case DSTRING:
 			// Reservar memoria para el lexema
 			lex->lex = (char*)malloc(sizeof(char) * (6 + 1));
-			strcpy(lex->lex, "STRING");
+			if (lex->lex)
+			{
+				strcpy(lex->lex, "STRING");
+			}
+			
 			restartPointers();
 			return;
+		default:
+			break;
 	}
 
 	// Si el lexema se encuentra entre el final del bloque B y el principio del bloque A
@@ -210,6 +219,7 @@ void getLex(lexComp *lex) {
 	{
 		// Reservar memoria para el lexema
 		lex->lex = (char*)malloc(sizeof(char) * (lexSize + 1));
+		if (!lex->lex) return;
 
 		// Si el lexema se encuentra en la mitad de A y B
 		// ---lex|ema---
@@ -232,7 +242,7 @@ void getLex(lexComp *lex) {
 			strncpy(lex->lex, c.block[B] + c.start - N, (N*2) - c.start);
 
 			// Copiar segunda mitad en bloque A
-			//  ->ema---
+			//  ->ema---|
 			strncpy(lex->lex + (N * 2) - c.start, c.block[A], c.end);
 		}
 		// Caso normal
