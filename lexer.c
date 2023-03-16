@@ -26,10 +26,15 @@ int nextLexComp(lexComp* comp) {
 				// Obtener siguiente caracter
 				nC = nextChar();
 
+				// Estos no se imprimen
+				if (nC == ' ' || nC == '\t' || nC == '\r' || nC == '\n')
+				{
+					state = 0;
+					restartPointers();
+				}
 				// Si es un caracter separador
-				if (nC == ' ' || nC == '\t' || nC == '\r' || nC == '\n' || nC == '.' || nC == ',' || nC == ';' ||
-					nC == '-' || nC == '*' || nC == '%' || nC == '<' || nC == '>' || nC == '!' || nC == '?' ||
-					nC == '|' || nC == '^' || nC == '~' || nC == ':' ||
+				else if (nC == '.' || nC == ',' || nC == ';' || nC == '-' || nC == '*' || nC == '%' || nC == '<' ||
+					nC == '>' || nC == '!' || nC == '?' || nC == '|' || nC == '^' || nC == '~' || nC == ':' ||
 					nC == '{' || nC == '}' || nC == '(' || nC == ')' || nC == '[' || nC == ']')
 				{
 					comp->id = nC;
