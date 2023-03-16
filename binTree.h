@@ -42,28 +42,6 @@ binTree treeL(binTree A);
  * @param A - Arbol original
  */
 binTree treeR(binTree A);
-/**
- * Recupera la informacion de la celda de la raiz del arbol
- * @param A
- * @param E Puntero al nodo que apuntara a la informacion
- */
-void treeRead(binTree A, lexComp *E);
-
-/**
- * Comprueba si el elemento <E> existe en el arbol <A>
- * @param A
- * @param E
- */
-unsigned treeIsMember(binTree A, lexComp E);
-
-/**
- * Busca un nodo con clave <cl> en el arbol y, si existe
- * modifica el puntero <nodo> para que lo apunte.
- * @param A Arbol binario en el que se busca el nodo.
- * @param cl Clave que se buscara.
- * @param nodo Puntero a un lexComp.
- */
-void treeNodeSearch(binTree A, lexCompKey cl, lexComp *nodo);
 
 //FUNCIONES DE MODIFICACIÓN
 /**
