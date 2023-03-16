@@ -29,9 +29,9 @@ lexComp row[] = {
 *	Inserta simbolos reconocidos por el compilador
 */
 void initTable() {
-	treeCreate(table);
+	treeCreate(&table);
 	for (int i = 0; i < 10; i++)
-		treeInsert(table, row[i]);
+		treeInsert(&table, row[i]);
 }
 
 /*
@@ -39,6 +39,6 @@ void initTable() {
 *	Libera memoria de la tabla
 */
 void destroyTable() {
-	treeDestroy(table);
+	treeDestroy(&table);
 }
 

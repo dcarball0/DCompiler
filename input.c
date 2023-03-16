@@ -4,6 +4,7 @@
 #include "errorHandler.h"
 #include "input.h"
 #include <string.h>
+#include "defs.h"
 
 /*
 	Estructura doble centinela
@@ -170,6 +171,16 @@ void getLex(lexComp *lex) {
 	int lexSize;
 	lexSize = 0;
 
+	switch (lex->id)
+	{
+		case DSTRING:
+			// Reservar memoria para el lexema
+			lex->lex = (char*)malloc(sizeof(char) * (6 + 1));
+			strcpy(lex->lex, "STRING");
+			restartPointers();
+			return;
+	}
+
 	// Si el lexema se encuentra entre el final del bloque B y el principio del bloque A
 	// ema---|---lex
 	if (c.start > c.end) 
@@ -229,13 +240,6 @@ void getLex(lexComp *lex) {
 			// Si bloque A curBlock=0 -- bloqueA+start
 			// Si bloque B curBlock=1 -- bloqueB-N+start
 			strncpy(lex->lex, c.block[c.curBlock] - (N*c.curBlock) + c.start, c.end - c.start);
-
-			/*
-			* if (c.curBlock == A)
-				strncpy(lex->lex, c.block[A] + c.start, c.end - c.start);
-			if (c.curBlock == B)
-				strncpy(lex->lex, c.block[B] - N + c.start, c.end - c.start);
-			*/
 		}
 
 		lex->lex[lexSize] = '\0';

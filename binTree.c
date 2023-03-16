@@ -42,17 +42,15 @@ void treeDestroy(binTree *A) {
     if (*A != NULL) {
         treeDestroy(&(*A)->treeL);
         treeDestroy(&(*A)->treeR);
+
         if (&(*A)->info.lex != NULL) {
             free((*A)->info.lex);
             (*A)->info.lex = NULL;
         }
+
         free(*A);
         *A = NULL;
     }
-}
-
-void treeDestroyLexComp(lexComp *lex) {
-    free(lex->lex);
 }
 
 //OPERACIONES DE INFORMACIÓN
@@ -122,14 +120,23 @@ void treeNodeSearch(binTree A, lexCompKey cl, lexComp *nodo) {
    con la misma clave en el arbol. */
 void treeInsert(binTree *A, lexComp E) {
     if (treeIsEmpty(*A)) {
+        // Asignar memoria a la celda
         *A = (binTree) malloc(sizeof (struct celda));
+
+        //Asignar memoria al lexema y \0 y copiar datos
+        (*A)->info.lex = (char*)malloc(sizeof(char) * (strlen(E.lex) + 1));
+        strcpy((*A)->info.lex, E.lex);
+
         if (*A) {
-            (*A)->info = E;
+            // Poner fin de string
+            (*A)->info.lex[strlen(E.lex)] = '\0';
+            (*A)->info.id = E.id;
             (*A)->treeL = NULL;
             (*A)->treeR = NULL;
         }
         return;
     }
+
     lexCompKey cl = treeGetNodeKey(&E);
     int comp = _treeCompareKey(cl, (*A)->info);
     if (comp > 0) {
@@ -137,76 +144,4 @@ void treeInsert(binTree *A, lexComp E) {
     } else {
         treeInsert(&(*A)->treeL, E);
     }
-}
-
-/* Funcion privada que devuelve mínimo de subárbol dcho */
-lexComp treeRemoveNodeMin(binTree * A) {//Se devuelve el elemento más a la izquierda
-    binTree aux;
-    lexComp ele;
-    if (treeIsEmpty((*A)->treeL)) {//Si izquierda vacía, se devuelve valor nodo actual A
-        ele = (*A)->info;
-        aux = *A;
-        *A = (*A)->treeR;
-        free(aux);
-        return ele;
-    } else {
-        return treeRemoveNodeMin(&(*A)->treeL); //se vuelve a buscar mínimo rama izquierda
-    }
-}
-
-/* Funcion que permite eliminar un nodo del arbol */
-void treeRemoveNode(binTree *A, lexComp E) {
-    binTree aux;
-    if (treeIsEmpty(*A)) {
-        return;
-    }
-
-    lexCompKey cl = treeGetNodeKey(&E);
-    int comp = _treeCompareKey(cl, (*A)->info);
-    if (comp < 0) { //if (E < (*A)->info) {
-        treeRemoveNode(&(*A)->treeL, E);
-    } else if (comp > 0) { //(E > (*A)->info) {
-        treeRemoveNode(&(*A)->treeR, E);
-    } else if (treeIsEmpty((*A)->treeL) && treeIsEmpty((*A)->treeR)) {
-        treeDestroyLexComp(&((*A)->info));
-        free(*A);
-        *A = NULL;
-    } else if (treeIsEmpty((*A)->treeL)) { // pero no es vacio derecha
-        aux = *A;
-        *A = (*A)->treeR;
-        treeDestroyLexComp(&aux->info);
-        free(aux);
-    } else if (treeIsEmpty((*A)->treeR)) { //pero no es vacio izquierda
-        aux = *A;
-        *A = (*A)->treeL;
-        treeDestroyLexComp(&aux->info);
-        free(aux);
-    } else { //ni derecha ni izquierda esta vacio, busco mínimo subárbol derecho
-        treeDestroyLexComp(&(*A)->info); //elimino la info pero no libero el nodo,
-        //pues en su sitio voy a poner el mínimo del subárbol derecho
-        (*A)->info = treeRemoveNodeMin(&(*A)->treeR);
-    }
-}
-
-/* Funcion privada para pasar la clave y no tener que
-   extraerla del nodo en las llamadas recursivas.*/
-void _treeModify(binTree A, lexCompKey cl, lexComp nodo) {
-    if (treeIsEmpty(A)) {
-        return;
-    }
-    int comp = _treeCompareKey(cl, A->info);
-    if (comp == 0) {
-        A->info = nodo;
-    } else if (comp < 0) {
-        _treeModify(A->treeL, cl, nodo);
-    } else {
-        _treeModify(A->treeR, cl, nodo);
-    }
-}
-
-
-/* Permite modificar el nodo extrayendo del mismo la clave */
-void treeModify(binTree A, lexComp nodo) {
-    lexCompKey cl = treeGetNodeKey(&nodo);
-    _treeModify(A, cl, nodo);
 }

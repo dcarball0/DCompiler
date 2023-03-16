@@ -16,4 +16,6 @@
 #define PLUSEQUALS 9991
 #define EQUALSEQUALS 9992
 
+#define DSTRING 8880
+
 #endif

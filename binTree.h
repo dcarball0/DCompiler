@@ -74,18 +74,6 @@ void treeNodeSearch(binTree A, lexCompKey cl, lexComp *nodo);
  * @param E Informacion del nuevo nodo.
  */
 void treeInsert(binTree *A, lexComp E);
-/**
- * Suprime el nodo del arbol <A>
- * @param A
- * @param E
- */
-void treeRemoveNode(binTree *A,lexComp E);
-/**
- * Busca el nodo con clave la del nodo y lo modifica.
- * @param A
- * @param nodo
- */
-void treeModify(binTree A, lexComp nodo);
 
 #endif	// binTree_H
 

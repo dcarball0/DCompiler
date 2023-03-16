@@ -26,36 +26,36 @@ void syntaxAnalysis() {
 		if (comp.lex) {
 			free(comp.lex);
 			comp.lex = NULL;
-			comp.id = 0;
+			comp.id = -1;
 		}
 	}
 }
 
 /*
 * Imprime componente lexico <c>
-* @param c: componente lexico a imprimir
+*   @param c: componente lexico a imprimir
 */
 void syntaxPrintLexComp(lexComp comp) {
 	printf("<%d, ", comp.id);
-    if (printSpecialChar(comp.lex) < 0)
-        printf("%s> \n", comp.lex);
+    if (printSpecialChar(comp) < 0)
+        printf("%s> ", comp.lex);
     else
         printf("> \n");
 }
 
 /*
 * Imprime caracteres especiales
-* @param _c: caracter a imprimir si es especial
-* @return -1: si no es especial
-* @return 0: si es especial
+*   @param _c: caracter a imprimir si es especial
+*   @return -1: si no es especial
+*   @return 0: si es especial
 */
-int printSpecialChar(char* _c) {
+int printSpecialChar(lexComp _c) {
 
     // Null check
-    if (!_c) return -1;
+    if (!_c.lex) return -1;
 
     // Comprobamos el primer caracter solo
-    switch (_c[0]) {
+    switch (_c.lex[0]) {
         case '\n':
             printf("\\n");
             break;

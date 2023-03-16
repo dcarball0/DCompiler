@@ -28,7 +28,9 @@ int nextLexComp(lexComp* comp) {
 
 				// Si es un caracter separador
 				if (nC == ' ' || nC == '\t' || nC == '\r' || nC == '\n' || nC == '.' || nC == ',' || nC == ';' ||
-					nC == '}' || nC == '{' || nC == '(' || nC == ')' || nC == '[' || nC == ']' || nC == '-')
+					nC == '-' || nC == '*' || nC == '%' || nC == '<' || nC == '>' || nC == '!' || nC == '?' ||
+					nC == '|' || nC == '^' || nC == '~' || nC == ':' ||
+					nC == '{' || nC == '}' || nC == '(' || nC == ')' || nC == '[' || nC == ']')
 				{
 					comp->id = nC;
 					getLex(comp);
@@ -53,6 +55,11 @@ int nextLexComp(lexComp* comp) {
 				else if (nC == '+' || nC == '=')
 				{
 					state = 4;
+				}
+				// Si es una string
+				else if (nC == '"')
+				{
+					state = 5;
 				}
 				else if (nC == EOF)
 				{
@@ -248,6 +255,37 @@ int nextLexComp(lexComp* comp) {
 						accept = 1;
 					}
 				}
+				break;
+			/*
+			* CASO Strings - Hacer igual que comentarios //
+			*/
+			case 5:
+				bool closeString;
+				closeString = 0;
+
+				while (!closeString) 
+				{
+					nC = nextChar();
+					// Se pueden escapar haciendo \", comprobamos si estan juntos
+					if (nC == '\\')
+					{
+						nC = nextChar();
+						if (nC == '"')
+						{
+							nC = nextChar();
+						}
+					}
+					// Si es fin de string
+					else if (nC == '"') {
+
+						closeString = 1;
+					}
+				}
+
+				state = 0;
+				comp->id = DSTRING;
+				getLex(comp);
+				accept = 1;
 				break;
 		}
 	}
