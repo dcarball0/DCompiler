@@ -2,16 +2,8 @@
 #include <stdlib.h>
 #include <stdbool.h> 
 #include "errorHandler.h"
-
-/*
-* Definiciones
-* N: Potencia de la unidad de asignacion
-* A: Referencia a bloque en centinela
-* B: Referencia a bloque en centinela
-*/
-#define N 64
-#define A 0
-#define B 1
+#include "input.h"
+#include <string.h>
 
 /*
 	Estructura doble centinela
@@ -63,7 +55,7 @@ void dOpen(char* dir) {
 	// Abrir archivo
 	if ((in = fopen(dir, "r")) != NULL) 
 	{
-		initCentinela();
+		initInput();
 
 		// Cargar contenido de primer bloque
 		loadBlock();
@@ -89,11 +81,12 @@ void dClose() {
 void loadBlock() {
 	// Actualizar puntero a posicion actual
 	fseek(in, inPos, SEEK_SET);
+
+	short oldInPos;
+	oldInPos = inPos;
 	
 	// Sumar el numero de caracteres leidos a la posicion
-	inPos += fread(c.block[c.curBlock], sizeof(char), N, in);
-
-	//TODO: Comprobar si lexema sobrepasa al final de bloque
+	inPos += (int)fread(c.block[c.curBlock], sizeof(char), N, in);
 }
 
 /*
@@ -103,7 +96,7 @@ void loadBlock() {
 char nextChar() {
 	// Leer caracter
 	char r;
-	r = c.block[!c.curBlock][c.end]; // !c.curBlock porque ya cambiamos la variable en loadBlock()
+	r = c.block[c.curBlock][c.end - (N * c.curBlock)]; // !c.curBlock porque ya cambiamos la variable en loadBlock()
 
 	// Comprobar EOF - Llegar al final del bloque o final de archivo
 	if (r == EOF)
@@ -114,14 +107,13 @@ char nextChar() {
 			// Cambiar bloque actual
 			c.curBlock = !c.curBlock;
 
+			c.end = c.curBlock*(N + 1);
+
+			loadBlock();
+
 			//TODO: Comprobar retroceder
 
 			r = nextChar();
-		}
-		// Final de archivo
-		else
-		{
-			c.end++;
 		}
 	}
 	// Si no se leyo EOF, continuar puntero final centinela
@@ -129,4 +121,124 @@ char nextChar() {
 	{
 		c.end++;
 	}	
+	return r;
+}
+
+/*
+*	Hace retroceder al puntero delantero para que se posicione en el final del lexema
+*/
+void returnPointer() {
+	// Lexema acaba justo al final del bloque B
+	if (c.curBlock == A && c.end == 0) 
+	{
+		// Cambiamos al bloque anterior
+		c.curBlock = B;
+
+		// Cambiamos el puntero al final del bloque B
+		c.end = (N * 2) - 1;
+	}
+
+	// Lexema acaba justo al final del bloque A
+	else if (c.curBlock == A && c.end == (N + 1)) 
+	{
+		// Cambiamos al bloque anterior
+		c.curBlock = A;
+
+		// Cambiamos el puntero al final del bloque A
+		c.end = N - 1;
+	}
+	// Caso normal, lexema acaba en mitad de un bloque
+	else 
+	{
+		c.end--;
+	}
+}
+
+/*
+*	Reiniciar posicion puntero inicial a puntero final
+*/
+void restartPointers() {
+	c.start = c.end;
+}
+
+/*
+*	Devuelve el lexema actual en <lex>
+*	@param lex: variable en la que se recogerá el lexema
+*/
+void getLex(lexComp *lex) {
+	// Tamaño lexema
+	int lexSize;
+	lexSize = 0;
+
+	// Si el lexema se encuentra entre el final del bloque B y el principio del bloque A
+	// ema---|---lex
+	if (c.start > c.end) 
+	{
+		lexSize = 2 * N - c.start + c.end;
+	}
+	// Caso normal
+	// --lexema--|------
+	else
+	{
+		lexSize = c.end - c.start;
+	}
+
+	// CASO Lexema es mas grande que el bloque (condicion para psicopatas)
+	// abcdefghijk|lmnopqrst--
+	if (lexSize >= N)
+	{
+		// TODO: Gestion de errores lex size greater than block
+
+		// Reiniciar punteros
+		restartPointers();
+	}
+	// CASO Lexema es menor que el tamaño de bloque
+	else
+	{
+		// Reservar memoria para el lexema
+		lex->lex = (char*)malloc(sizeof(char) * (lexSize + 1));
+
+		// Si el lexema se encuentra en la mitad de A y B
+		// ---lex|ema---
+		if (c.start < N && c.end > N)
+		{
+			// Copiar primera mitad en bloque A
+			// ->lex|
+			strncpy(lex->lex, c.block[A] + c.start, N - c.start);
+
+			// Copiar segunda mitad en bloque B
+			// |ema<-
+			strncpy(lex->lex + N - c.start, c.block[B] , c.end - N);
+		}
+		// Si el lexema se encuentra en en final de B y el inicio de A
+		// ema---|---lex
+		else if (c.start > N && c.end < N)
+		{
+			// Copiar primera mitad en bloque B
+			// |--- ->lex
+			strncpy(lex->lex, c.block[B] + c.start - N, (N*2) - c.start);
+
+			// Copiar segunda mitad en bloque A
+			//  ->ema---
+			strncpy(lex->lex + (N * 2) - c.start, c.block[A], c.end);
+		}
+		// Caso normal
+		// --lexema--|------
+		else
+		{
+			// Si bloque A curBlock=0 -- bloqueA+start
+			// Si bloque B curBlock=1 -- bloqueB-N+start
+			strncpy(lex->lex, c.block[c.curBlock] - (N*c.curBlock) + c.start, c.end - c.start);
+
+			/*
+			* if (c.curBlock == A)
+				strncpy(lex->lex, c.block[A] + c.start, c.end - c.start);
+			if (c.curBlock == B)
+				strncpy(lex->lex, c.block[B] - N + c.start, c.end - c.start);
+			*/
+		}
+
+		lex->lex[lexSize] = '\0';
+		restartPointers();
+	}
 }

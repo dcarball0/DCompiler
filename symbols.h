@@ -1,6 +1,8 @@
 #ifndef SYMBOLS_H
 #define SYMBOLS_H
 
+#include "binTree.h"
+
 /*
 * Inicializar tabla
 */

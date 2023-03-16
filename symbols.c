@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <string.h>
+
 #include "symbols.h"
 #include "defs.h"
 #include "binTree.h"
@@ -26,10 +29,9 @@ lexComp row[] = {
 *	Inserta simbolos reconocidos por el compilador
 */
 void initTable() {
-	treeCreate(&table);
-
+	treeCreate(table);
 	for (int i = 0; i < 10; i++)
-		insertSymbol(row[i]);
+		treeInsert(table, row[i]);
 }
 
 /*
@@ -38,24 +40,5 @@ void initTable() {
 */
 void destroyTable() {
 	treeDestroy(table);
-}
-
-/*
-* Insertar row en binTree table
-*	@param row: elemento a añadir en la tabla
-*/
-void insertSymbol(lexComp row) {
-	//Simbolo a crear
-	lexComp s;
-
-	// Reservar memoria y copiar informacion lexema
-	s.lex = (char*)malloc(sizeof(char) * (strlen(row.lex) + 1));
-	strcpy(s.lex, row.lex);
-
-	// Asignar id
-	s.id = row.id;
-
-	// Insertar en tabla
-	insert(&table, s);
 }
 

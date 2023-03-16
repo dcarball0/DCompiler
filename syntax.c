@@ -1,6 +1,8 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "lexer.h"
 #include "binTree.h"
+#include "syntax.h"
 
 /*
 * Analisis sintactico
@@ -10,21 +12,21 @@
 */
 void syntaxAnalysis() {
     // Buffer Componente lexico
-	lexComp c;
+	lexComp comp;
 
     // Mientras siga habiendo componentes lexicos
-	while (nextLexComp(&c))
+	while (nextLexComp(&comp))
 	{
 		// Imprimir codigo lexico
-		syntaxPrintLexComp(c);
+		syntaxPrintLexComp(comp);
 
         // Mandar a otro sitio
 
         // Liberar memoria una vez leido
-		if (c.lex) {
-			free(c.lex);
-			c.lex = NULL;
-			c.id = 0;
+		if (comp.lex) {
+			free(comp.lex);
+			comp.lex = NULL;
+			comp.id = 0;
 		}
 	}
 }
@@ -33,12 +35,12 @@ void syntaxAnalysis() {
 * Imprime componente lexico <c>
 * @param c: componente lexico a imprimir
 */
-void syntaxPrintLexComp(lexComp c) {
-	printf("<%d, ", c.id);
-    if (printSpecialChar(c.lex) < 0)
-        printf("%s> \n", c.lex);
+void syntaxPrintLexComp(lexComp comp) {
+	printf("<%d, ", comp.id);
+    if (printSpecialChar(comp.lex) < 0)
+        printf("%s> \n", comp.lex);
     else
-        printf("> \n", c.lex);
+        printf("> \n");
 }
 
 /*
@@ -64,10 +66,7 @@ int printSpecialChar(char* _c) {
             printf("\\t");
             break;
         default:
-            if ((_c < 0x20) || (_c > 0x7f))
-                printf("\\%03o", _c[0]);
-            else
-                return -1;
+            return -1;
             break;
     }
     return 0;

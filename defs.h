@@ -12,4 +12,8 @@
 #define VOID 308
 #define CAST 309
 
+#define PLUSPLUS 9990
+#define PLUSEQUALS 9991
+#define EQUALSEQUALS 9992
+
 #endif

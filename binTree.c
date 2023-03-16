@@ -42,9 +42,17 @@ void treeDestroy(binTree *A) {
     if (*A != NULL) {
         treeDestroy(&(*A)->treeL);
         treeDestroy(&(*A)->treeR);
+        if (&(*A)->info.lex != NULL) {
+            free((*A)->info.lex);
+            (*A)->info.lex = NULL;
+        }
         free(*A);
         *A = NULL;
     }
+}
+
+void treeDestroyLexComp(lexComp *lex) {
+    free(lex->lex);
 }
 
 //OPERACIONES DE INFORMACIÓN
@@ -160,21 +168,21 @@ void treeRemoveNode(binTree *A, lexComp E) {
     } else if (comp > 0) { //(E > (*A)->info) {
         treeRemoveNode(&(*A)->treeR, E);
     } else if (treeIsEmpty((*A)->treeL) && treeIsEmpty((*A)->treeR)) {
-        //_destruir_elem(&((*A)->info));
+        treeDestroyLexComp(&((*A)->info));
         free(*A);
         *A = NULL;
     } else if (treeIsEmpty((*A)->treeL)) { // pero no es vacio derecha
         aux = *A;
         *A = (*A)->treeR;
-        _destruir_elem(&aux->info);
+        treeDestroyLexComp(&aux->info);
         free(aux);
     } else if (treeIsEmpty((*A)->treeR)) { //pero no es vacio izquierda
         aux = *A;
         *A = (*A)->treeL;
-        _destruir_elem(&aux->info);
+        treeDestroyLexComp(&aux->info);
         free(aux);
     } else { //ni derecha ni izquierda esta vacio, busco mínimo subárbol derecho
-        _destruir_elem(&(*A)->info); //elimino la info pero no libero el nodo,
+        treeDestroyLexComp(&(*A)->info); //elimino la info pero no libero el nodo,
         //pues en su sitio voy a poner el mínimo del subárbol derecho
         (*A)->info = treeRemoveNodeMin(&(*A)->treeR);
     }
