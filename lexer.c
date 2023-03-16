@@ -2,6 +2,7 @@
 #include "input.h"
 #include "defs.h"
 #include <ctype.h>
+#include "symbols.h"
 
 /*
 * Automata que devuelve el siguiente componente lexico
@@ -29,16 +30,19 @@ int nextLexComp(lexComp* comp) {
 				// Estos no se imprimen
 				if (nC == ' ' || nC == '\t' || nC == '\r' || nC == '\n')
 				{
-					state = 0;
+					// Pasar a siguiente componente
 					restartPointers();
 				}
-				// Si es un caracter separador
+				// Si es un caracter separador no entra en otro estado
 				else if (nC == '.' || nC == ',' || nC == ';' || nC == '-' || nC == '*' || nC == '%' || nC == '<' ||
 					nC == '>' || nC == '!' || nC == '?' || nC == '|' || nC == '^' || nC == '~' || nC == ':' ||
 					nC == '{' || nC == '}' || nC == '(' || nC == ')' || nC == '[' || nC == ']')
 				{
+					// IDs de estos elementos son su codigo ascii
 					comp->id = nC;
+					// Copiar lexema a componente
 					getLex(comp);
+					// Aceptar cadenaúú
 					accept = 1;
 				}
 				// Si es un identificador
@@ -46,26 +50,27 @@ int nextLexComp(lexComp* comp) {
 				{
 					state = 1;
 				}
-				// Si es un numero
-				else if (isdigit(nC))
-				{
-					state = 2;
-				}
 				// Si es un comentario
 				else if (nC == '/')
 				{
-					state = 3;
+					state = 2;
 				}
 				// Si es un operador doble
 				else if (nC == '+' || nC == '=')
 				{
-					state = 4;
+					state = 3;
 				}
 				// Si es una string
 				else if (nC == '"')
 				{
+					state = 4;
+				}
+				// Si es un numero
+				else if (isdigit(nC))
+				{
 					state = 5;
 				}
+				// Parar en fin de cadena
 				else if (nC == EOF)
 				{
 					return 0;
@@ -79,7 +84,7 @@ int nextLexComp(lexComp* comp) {
 				// Obtener siguiente caracter
 				nC = nextChar();
 
-				// Mientras sigamos en el mismo lexema
+				// Mientras sigamos en el mismo lexema, seguir avanzando
 				while (isalpha(nC) || isdigit(nC) || nC == '_')
 				{
 					nC = nextChar();
@@ -87,30 +92,24 @@ int nextLexComp(lexComp* comp) {
 
 				// Retroceder puntero una vez llega a caracter separador
 				if (nC != EOF)
+				{
 					returnPointer();
+				}
 
+				// Caso default si no es palabra reservada
+				comp->id = DIDENTIFIER;
 				// Devuelve lexema entre punteros
 				getLex(comp);
-
-				// Devuelve el identificador relacionado al lexema
-				//getLexID();
-				comp->id = 300;
+				// Si es palabra reservada aqui devuelve el codigo especifico
+				getID(comp);
+				// Aceptar cadena para guardar componente lexico
 				accept = 1;
 				break;
 
-			/*
-			* CASO Numeros - Comprobar tipo
-			*/
-			case 2:
-				// Obtener siguiente caracter
-				nC = nextChar();
-				comp->id = INT;
-				accept = 1;
-				break;
 			/*
 			* CASO Comentarios - Anidados y no anidados
 			*/
-			case 3:
+			case 2:
 				// Obtener siguiente caracter
 				nC = nextChar();
 
@@ -122,7 +121,9 @@ int nextLexComp(lexComp* comp) {
 						nC = nextChar();
 					}
 
+					// Reiniciar estado ya que no lo imprimimos
 					state = 0;
+					// Pasar a siguiente componente
 					restartPointers();
 					break;
 				}
@@ -154,7 +155,9 @@ int nextLexComp(lexComp* comp) {
 						nC = nextChar();
 					}
 
+					// Reiniciar estado ya que no lo imprimimos
 					state = 0;
+					// Pasar a siguiente componente
 					restartPointers();
 					break;
 				}
@@ -177,36 +180,46 @@ int nextLexComp(lexComp* comp) {
 							nC = nextChar();
 							if (nC == '/')
 							{
+								// Restar un comentario abierto
 								nestedCount--;
 							}
 						}
 						// Si encontramos un /, comprobar si es apertura (else if para evitar que entre en un /+ +/+)
 						else if (nC == '/')
 						{
-							// Una vez encontrado +, buscar si es cierre de comentario
+							// Una vez encontrado /, buscar si es apertura de comentario
 							nC = nextChar();
 							if (nC == '+')
 							{
+								// Sumar uno a la cuenta de comentarios abiertos
 								nestedCount++;
 							}
 						}
 					}
 
+					// Reiniciar estado ya que no lo imprimimos
 					state = 0;
+					// Pasar a siguiente componente
 					restartPointers();
 					break;
 				}
+				// Si es un / de division
 				else
 				{
+					// Retroceder un caracter para poder leerlo bien
+					returnPointer();
+					// Tomamos su id como su codigo ascii
 					comp->id = nC;
-					getLex(comp); // todo
+					// Devuelve lexema entre punteros
+					getLex(comp);
+					// Aceptar cadena para guardar componente lexico
 					accept = 1;
 				}
 			break;
 			/*
 			* CASO Operadores dobles - Comprobar cual es, en el codigo solo hay ++, += y ==
 			*/
-			case 4:
+			case 3:
 				// Comprobar en que comienzo de doble operador estamos
 				if (nC == '+') 
 				{
@@ -214,27 +227,31 @@ int nextLexComp(lexComp* comp) {
 					nC = nextChar();
 					if (nC == '+')
 					{
+						// Tomamos su id de la tabla
+						comp->id = PLUSPLUS;
 						// Devuelve lexema entre punteros
 						getLex(comp);
-
-						comp->id = PLUSPLUS;
+						// Aceptar cadena para guardar componente lexico
 						accept = 1;
 					}
 					else if (nC == '=')
 					{
+						// Tomamos su id de la tabla
+						comp->id = PLUSEQUALS;
 						// Devuelve lexema entre punteros
 						getLex(comp);
-
-						comp->id = PLUSEQUALS;
+						// Aceptar cadena para guardar componente lexico
 						accept = 1;
 					}
-					// No es doble operador
+					// No es doble operador (Solo un +)
 					else {
 						// Retroceder puntero una vez llega a caracter separador
 						returnPointer();
-
+						// Devuelve lexema entre punteros
 						comp->id = nC;
+						// Devuelve lexema entre punteros
 						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
 						accept = 1;
 					}
 				}
@@ -244,19 +261,22 @@ int nextLexComp(lexComp* comp) {
 					nC = nextChar();
 					if (nC == '=')
 					{
+						// Tomamos su id de la tabla
+						comp->id = EQUALSEQUALS;
 						// Devuelve lexema entre punteros
 						getLex(comp);
-
-						comp->id = EQUALSEQUALS;
+						// Aceptar cadena para guardar componente lexico
 						accept = 1;
 					}
 					// No es doble operador
 					else {
 						// Retroceder puntero una vez llega a caracter separador
 						returnPointer();
-
+						// Devuelve lexema entre punteros
 						comp->id = nC;
+						// Devuelve lexema entre punteros
 						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
 						accept = 1;
 					}
 				}
@@ -264,12 +284,14 @@ int nextLexComp(lexComp* comp) {
 			/*
 			* CASO Strings - Hacer igual que comentarios //
 			*/
-			case 5:
+			case 4:
+				// Variable para comprobar si se cierra la string
 				bool closeString;
 				closeString = 0;
 
 				while (!closeString) 
 				{
+					// Avanzar en string
 					nC = nextChar();
 					// Se pueden escapar haciendo \", comprobamos si estan juntos
 					if (nC == '\\')
@@ -281,15 +303,26 @@ int nextLexComp(lexComp* comp) {
 						}
 					}
 					// Si es fin de string
-					else if (nC == '"') {
-
+					else if (nC == '"') 
+					{
+						// Salimos del bucle
 						closeString = 1;
 					}
 				}
-
-				state = 0;
+				// Tomamos su id de la tabla
 				comp->id = DSTRING;
+				// Tomamos su lexema a partir del id
 				getLex(comp);
+				// Aceptar cadena para guardar componente lexico
+				accept = 1;
+				break;
+			/*
+			* CASO Numeros - Comprobar tipo
+			*/
+			case 5:
+				// Obtener siguiente caracter
+				nC = nextChar();
+				comp->id = DINT;
 				accept = 1;
 				break;
 		}

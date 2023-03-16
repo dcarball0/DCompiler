@@ -12,6 +12,6 @@ void printTable();
 
 void destroyTable();
 
-void translateSymbol();
+void getID(lexComp* lex);
 
 #endif

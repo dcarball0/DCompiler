@@ -108,13 +108,14 @@ char nextChar() {
 			// Cambiar bloque actual
 			c.curBlock = !c.curBlock;
 
-			c.end = c.curBlock*(N + 1);
+			c.end = c.curBlock*N;
 
 			loadBlock();
 
 			//TODO: Comprobar retroceder
 
 			r = nextChar();
+			return r;
 		}
 	}
 	// Si no se leyo EOF, continuar puntero final centinela
@@ -171,6 +172,7 @@ void getLex(lexComp *lex) {
 	int lexSize;
 	lexSize = 0;
 
+	// Obtener lexema a partir de id (reemplazar cadena por STRING)
 	switch (lex->id)
 	{
 		case DSTRING:

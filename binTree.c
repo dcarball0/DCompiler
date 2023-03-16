@@ -104,3 +104,45 @@ void treeInsert(binTree *A, lexComp E) {
         treeInsert(&(*A)->treeL, E);
     }
 }
+
+unsigned treeIsMember(binTree A, lexComp E) {
+    return treeIsMemberByLex(A, treeGetNodeKey(&E));
+}
+
+void treeNodeSearch(binTree A, lexCompKey cl, lexComp* nodo) {
+    if (treeIsEmpty(A)) {
+        return;
+    }
+    int comp = _treeCompareKey(cl, A->info);
+
+    if (comp == 0) { // cl == A->info
+        *nodo = A->info;
+    }
+    else if (comp < 0) { // cl < A->info
+        treeNodeSearch(A->treeL, cl, nodo);
+    }
+    else { // cl > A->info
+        treeNodeSearch(A->treeR, cl, nodo);
+    }
+}
+
+/*
+ * Funcion encargada de encontrar un lexema dentro de el arbol. 
+ * Si el elemento no esta en la tabla, se introducirá
+ */
+unsigned treeIsMemberByLex(binTree A, lexCompKey cl) {
+    if (treeIsEmpty(A)) {
+        return 0;
+    }
+    
+    int comp = strcmp(A->info.lex, cl);
+
+    if (comp == 0) { //cl == A->info
+        return 1;
+    }
+    else if (comp > 0) { //cl > A->info
+        return treeIsMemberByLex(treeL(A), cl);
+    }
+    //cl < A->info
+    return treeIsMemberByLex(treeR(A), cl);
+}

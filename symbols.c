@@ -10,17 +10,18 @@
 * row: componentes reconocidos por el compilador
 */
 binTree table;
-lexComp row[] = {
-	{"identificador", ID},
-	{"import", IMPORT},
-	{"string", STRING},
-	{"int", INT},
-	{"float", FLOAT},
-	{"while", WHILE},
-	{"foreach", FOREACH},
-	{"return", RETURN},
-	{"void", VOID},
-	{"cast", CAST}
+lexComp symbols[] = {
+	{"import", DIMPORT},
+	{"identifier", DIDENTIFIER},
+	{"double", DDOUBLE},
+	{"string", DSTRING},
+	{"int", DINT},
+	{"float", DFLOAT},
+	{"while", DWHILE},
+	{"foreach", DFOREACH},
+	{"return", DRETURN},
+	{"void", DVOID},
+	{"cast", DCAST}
 };
 
 /*
@@ -29,9 +30,11 @@ lexComp row[] = {
 *	Inserta simbolos reconocidos por el compilador
 */
 void initTable() {
+	int nRows = sizeof(symbols) / sizeof(symbols[0]);
 	treeCreate(&table);
-	for (int i = 0; i < 10; i++)
-		treeInsert(&table, row[i]);
+
+	for (int i = 0; i < nRows; i++)
+		treeInsert(&table, symbols[i]);
 }
 
 /*
@@ -42,3 +45,10 @@ void destroyTable() {
 	treeDestroy(&table);
 }
 
+void getID(lexComp* lex) {
+	if (treeIsMember(table, *lex)) {
+		lexComp s;
+		treeNodeSearch(table, lex->lex, &s);
+		lex->id = s.id;
+	}
+}

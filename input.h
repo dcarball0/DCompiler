@@ -51,6 +51,11 @@ char nextChar();
 void returnPointer();
 
 /*
+*	Reiniciar posicion puntero inicial a puntero final
+*/
+void restartPointers();
+
+/*
 *	Devuelve el lexema actual en <lex>
 *	@param lex: variable en la que se recogerá el lexema
 */

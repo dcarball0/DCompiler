@@ -1,21 +1,31 @@
 #ifndef DEFSH
 #define DEFSH
+/*
+* Tabla de simbolos
+*	111x Palabras reservadas
+*	222x Tipos de datos
+* 
+*	999x Operadores doble simbolo
+*	
+*/
 
-#define IMPORT 300
-#define ID 301  // STD es un identificador
-#define STRING 302
-#define INT 303
-#define FLOAT 304
-#define WHILE 305
-#define FOREACH 306
-#define RETURN 307
-#define VOID 308
-#define CAST 309
+#define DIDENTIFIER 1110
+#define DIMPORT 1111
+#define DWHILE 1112
+#define DFOREACH 1113
+#define DRETURN 1114
+
+#define DDATATYPE 2220
+#define DDOUBLE 2221
+#define DINT 2222
+#define DFLOAT 2223
+#define DVOID 2224
+#define DSTRING 2225
+
+#define DCAST 309
 
 #define PLUSPLUS 9990
 #define PLUSEQUALS 9991
 #define EQUALSEQUALS 9992
-
-#define DSTRING 8880
 
 #endif
