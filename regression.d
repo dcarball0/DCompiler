@@ -1,4 +1,4 @@
-import import std.stdio;
+import std.stdio;
 import std.algorithm.iteration;
 import std.exception;
 

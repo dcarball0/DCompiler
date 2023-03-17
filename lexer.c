@@ -24,7 +24,7 @@ void doFloating(char nC) {
 		if (nC == 'e' || nC == 'E') {
 			// 1.0_00e
 			nC = nextChar();
-			if (nC == '+' || nC == '-' || isdigit(nC))
+			if (nC == '+' || nC == '-' || isdigit(nC) || nC == '_')
 			{
 				// 1.0_00+
 				nC = nextChar();
@@ -49,7 +49,7 @@ void doFloating(char nC) {
 		// Buscar patron 1e+12_3 1e-1 1e2
 		// 1.0_00e
 		nC = nextChar();
-		if (nC == '+' || nC == '-' || isdigit(nC))
+		if (nC == '+' || nC == '-' || isdigit(nC) || nC == '_')
 		{
 			// 1e+ 1e0
 			nC = nextChar();
