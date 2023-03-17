@@ -3,18 +3,26 @@
 #include "syntax.h"
 
 int main(int argc, char** argv) {
-	// Inicializar sistema de entrada
-	dOpen(argv[1]);
+	// Comprobar numero adecuado de argumentos
+	if (argc == 2) 
+	{
+		// Inicializar sistema de entrada
+		dOpen(argv[1]);
 
-	// Inicializar tabla de simbolos
-	initTable();
+		// Inicializar tabla de simbolos
+		initTable();
 
-	// Realizar analisis sintactico
-	syntaxAnalysis();
+		// Realizar analisis sintactico
+		syntaxAnalysis();
 
-	// Liberar recursos
-	destroyTable();
-	dClose();
-	// Espera infinita
-	for (;;);
+		// Liberar recursos
+		destroyTable();
+		dClose();
+		// Espera infinita
+		//for (;;);
+	}
+	else 
+	{
+		printf("Uso ./dCompiler [archivo]\n");
+	}
 }
