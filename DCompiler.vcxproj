@@ -144,6 +144,7 @@
     <ClCompile Include="errorHandler.c" />
     <ClCompile Include="lexer.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="makefile" />
     <ClCompile Include="symbols.c" />
     <ClCompile Include="syntax.c" />
   </ItemGroup>
@@ -155,6 +156,9 @@
     <ClInclude Include="lexer.h" />
     <ClInclude Include="symbols.h" />
     <ClInclude Include="syntax.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="readme.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

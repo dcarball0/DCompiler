@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv) {
 	// Inicializar sistema de entrada
-	dOpen("B:\\Users\\SeiGaX\\Desktop\\CompInter\\DCompiler\\regression.d");
+	dOpen(argv[1]);
 
 	// Inicializar tabla de simbolos
 	initTable();
