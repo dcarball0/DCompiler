@@ -130,11 +130,11 @@ char nextChar() {
 			{
 				loadBlock();
 			}
+			// Si ya pasamos la iteracion sin cargar, reiniciar parametro
 			else 
 			{
 				c.dontLoad = false;
 			}
-
 
 			// Pasar a siguiente caracter si no acabo lexema en bloque
 			if (c.start != N)
@@ -149,8 +149,10 @@ char nextChar() {
 			
 			return r;
 		}
+		// Fin de archivo
 		else 
 		{
+			// Codigo para acabar archivo
 			return -2;
 		}
 	}
@@ -287,10 +289,13 @@ void getLex(lexComp *lex) {
 		{
 			// Si bloque A curBlock=0 -- bloqueA+start
 			// Si bloque B curBlock=1 -- bloqueB-N+start
+			// no preguntes
 			strncpy(lex->lex, c.block[c.curBlock] - (N*c.curBlock) + c.start, c.end - c.start);
 		}
 
+		// Terminar string
 		lex->lex[lexSize] = '\0';
+		// Reiniciar punteros
 		restartPointers();
 	}
 }
