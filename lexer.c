@@ -726,12 +726,8 @@ int nextLexComp(lexComp* comp) {
 			* CASO Strings - Hacer igual que comentarios //
 			*/
 			case 4:
-				// Variable para comprobar si se cierra la string
-				bool closeString;
-				closeString = 0;
-
 				// Recorrer string hasta que cierre
-				while (!closeString) 
+				while (1) 
 				{
 					// Avanzar en string
 					nC = nextChar();
@@ -749,14 +745,14 @@ int nextLexComp(lexComp* comp) {
 					{
 						comp->id = DSTRING;
 						// Salimos del bucle
-						closeString = 1;
+						break;
 					}
 					// No se cierra string salir del bucle
 					else if (nC == EOF) 
 					{
 						dCompError(ERR_UNCLOSED_STRING);
 						// Salir del bucle
-						closeString = 1;
+						break;
 					}
 				}
 				

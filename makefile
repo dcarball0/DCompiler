@@ -1,6 +1,5 @@
 CC = gcc
 CFLAGS = -Wall -Werror
-LIBS = -lncurses
 
 # Header files folder
 HEADER_FILES_DIR=.
@@ -23,7 +22,7 @@ TARGET = dCompiler
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET) $(LIBS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
