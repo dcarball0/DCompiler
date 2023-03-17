@@ -18,6 +18,8 @@ typedef struct {
 	int start;
 	int end;
 	bool curBlock;
+	bool dontLoad;
+	int line;
 } CENTINELA;
 
 /*
@@ -39,6 +41,7 @@ void initInput() {
 	c.start = 0;
 	c.end = 0;
 	c.curBlock = A;
+	c.line = 0;
 
 	// Inicializar EOF en centinela
 	c.block[A][N] = EOF;
@@ -56,6 +59,7 @@ void dOpen(char* dir) {
 	// Abrir archivo
 	if ((in = fopen(dir, "r")) != NULL) 
 	{
+		// Inicializar centinela
 		initInput();
 
 		// Cargar contenido de primer bloque
@@ -63,8 +67,7 @@ void dOpen(char* dir) {
 	}
 	else
 	{
-		// TODO: Gestion de errores
-		perror("Error al abrir el archivo.");
+		dCompError(ERR_FILE_OPEN);
 		exit(0);
 	}
 }
@@ -83,6 +86,8 @@ void loadBlock() {
 	// Actualizar puntero a posicion actual
 	fseek(in, inPos, SEEK_SET);
 
+	// Contar diferencia de caracteres para ver cuantos lee
+	// Si lee menos que N es que se acabo el archivo
 	short oldInPos;
 	oldInPos = inPos;
 	
@@ -102,6 +107,12 @@ char nextChar() {
 	char r;
 	r = c.block[c.curBlock][c.end - (N * c.curBlock)]; // !c.curBlock porque ya cambiamos la variable en loadBlock()
 
+	// Contar lineas para errores
+	if (r == '\n')
+	{
+		c.line++;
+	}
+	
 	// Comprobar EOF - Llegar al final del bloque o final de archivo
 	if (r == EOF)
 	{
@@ -111,14 +122,36 @@ char nextChar() {
 			// Cambiar bloque actual
 			c.curBlock = !c.curBlock;
 
+			// Puntero al principio del bloque actual
 			c.end = c.curBlock*N;
 
-			loadBlock();
+			// Cargar bloque
+			if (!c.dontLoad)
+			{
+				loadBlock();
+			}
+			else 
+			{
+				c.dontLoad = false;
+			}
 
-			//TODO: Comprobar retroceder
 
-			r = nextChar();
+			// Pasar a siguiente caracter si no acabo lexema en bloque
+			if (c.start != N)
+			{
+				r = nextChar();
+			}
+			// No volver a cargar el bloque B al volver a pasar
+			else {
+				c.end++;
+				r = c.block[c.curBlock][c.start - (N * c.curBlock)];
+			}
+			
 			return r;
+		}
+		else 
+		{
+			return -2;
 		}
 	}
 	// Si no se leyo EOF, continuar puntero final centinela
@@ -140,17 +173,20 @@ void returnPointer() {
 		c.curBlock = B;
 
 		// Cambiamos el puntero al final del bloque B
-		c.end = (N * 2) - 1;
+		c.end = (N * 2);
 	}
 
 	// Lexema acaba justo al final del bloque A
-	else if (c.curBlock == A && c.end == (N + 1)) 
+	else if (c.curBlock == B && c.end == (N + 1)) 
 	{
 		// Cambiamos al bloque anterior
 		c.curBlock = A;
 
+		// No volver a cargar el bloque B al volver a pasar
+		c.dontLoad = true;
+
 		// Cambiamos el puntero al final del bloque A
-		c.end = N - 1;
+		c.end = N;
 	}
 	// Caso normal, lexema acaba en mitad de un bloque
 	else 
@@ -209,7 +245,7 @@ void getLex(lexComp *lex) {
 	// abcdefghijk|lmnopqrst--
 	if (lexSize >= N)
 	{
-		// TODO: Gestion de errores lex size greater than block
+		dCompError(ERR_OVERFLOW_INTERNAL_BUFFER);
 
 		// Reiniciar punteros
 		restartPointers();

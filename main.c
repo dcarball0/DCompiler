@@ -15,5 +15,6 @@ int main(int argc, char** argv) {
 	// Liberar recursos
 	destroyTable();
 	dClose();
+	// Espera infinita
 	for (;;);
 }

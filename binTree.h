@@ -69,5 +69,11 @@ unsigned treeIsMember(binTree A, lexComp E);
  */
 void treeNodeSearch(binTree A, lexCompKey cl, lexComp* nodo);
 
+/**
+ * Imprime la tabla <A>
+ * @param A tabla de simbolos
+ */
+void printTable(binTree A);
+
 #endif	// binTree_H
 

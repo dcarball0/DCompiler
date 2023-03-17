@@ -3,6 +3,8 @@
 #include "defs.h"
 #include <ctype.h>
 #include "symbols.h"
+#include "errorHandler.h"
+
 /*
 *  RECONOCIMIENTO DE FLOATS
 */
@@ -36,12 +38,8 @@ void doFloating(char nC) {
 			}
 			else
 			{
-				// TODO: Handler error float mal formado
+				dCompError(ERR_BAD_NUMBER);
 			}
-		}
-		else
-		{
-			// TODO: Handler error float mal formado
 		}
 	}
 	else if (nC == 'e' || nC == 'E') {
@@ -61,7 +59,7 @@ void doFloating(char nC) {
 		}
 		else
 		{
-			// TODO: Handler error float mal formado
+			dCompError(ERR_BAD_NUMBER);
 		}
 	}
 }
@@ -116,9 +114,10 @@ int nextLexComp(lexComp* comp) {
 					restartPointers();
 				}
 				// Si es un caracter separador no entra en otro estado
-				else if (nC == '.' || nC == ',' || nC == ';' || nC == '-' || nC == '*' || nC == '%' || nC == '<' ||
-					nC == '>' || nC == '!' || nC == '?' || nC == '|' || nC == '^' || nC == '~' || nC == ':' ||
-					nC == '{' || nC == '}' || nC == '(' || nC == ')' || nC == '[' || nC == ']')
+				else if (nC == '.' || nC == ',' || nC == ';' ||
+					nC == '?' || nC == ':' || nC == '{' || 
+					nC == '}' || nC == '(' ||  nC == ')' || 
+					nC == '[' || nC == ']')
 				{
 					// IDs de estos elementos son su codigo ascii
 					comp->id = nC;
@@ -126,6 +125,11 @@ int nextLexComp(lexComp* comp) {
 					getLex(comp);
 					// Aceptar cadena
 					accept = 1;
+				}
+				// Parar en fin de texto
+				else if (nC == -2)
+				{
+					return 0;
 				}
 				// Si es un identificador
 				else if (isalpha(nC) || nC == '_')
@@ -138,7 +142,9 @@ int nextLexComp(lexComp* comp) {
 					state = 2;
 				}
 				// Si es un operador doble
-				else if (nC == '+' || nC == '=')
+				else if (nC == '+' || nC == '=' || nC == '-' || nC == '*' || 
+					nC == '%' || nC ==  '&' || nC == '^' || nC == '|' || 
+					nC == '!' || nC == '>' || nC == '<' || nC == '~')
 				{
 					state = 3;
 				}
@@ -151,11 +157,6 @@ int nextLexComp(lexComp* comp) {
 				else if (isdigit(nC))
 				{
 					state = 5;
-				}
-				// Parar en fin de cadena
-				else if (nC == EOF)
-				{
-					return 0;
 				}
 				break;
 
@@ -285,6 +286,16 @@ int nextLexComp(lexComp* comp) {
 					restartPointers();
 					break;
 				}
+				// Si es un /= 
+				else if (nC == '=')
+				{
+					// Tomamos su id de la tabla
+					comp->id = DIVEQUALS;
+					// Devuelve lexema entre punteros
+					getLex(comp);
+					// Aceptar cadena para guardar componente lexico
+					accept = 1;
+				}
 				// Si es un / de division
 				else
 				{
@@ -362,6 +373,354 @@ int nextLexComp(lexComp* comp) {
 						accept = 1;
 					}
 				}
+				else if (nC == '-')
+				{
+					// Comprobar final de doble operador -= o --
+					nC = nextChar();
+					if (nC == '-')
+					{
+						// Tomamos su id de la tabla
+						comp->id = MINUSMINUS;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+					else if (nC == '=')
+					{
+						// Tomamos su id de la tabla
+						comp->id = MINUSEQUALS;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+					// No es doble operador (Solo un -)
+					else {
+						// Retroceder puntero una vez llega a caracter separador
+						returnPointer();
+						// Devuelve lexema entre punteros
+						comp->id = nC;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+				}
+				else if (nC == '*')
+				{
+					// Comprobar *= o *
+					nC = nextChar();
+					if (nC == '=')
+					{
+						// Tomamos su id de la tabla
+						comp->id = MULTEQUALS;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+					// No es doble operador (Solo un *)
+					else {
+						// Retroceder puntero una vez llega a caracter separador
+						returnPointer();
+						// Devuelve lexema entre punteros
+						comp->id = nC;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+				}
+				else if (nC == '%') 
+				{
+					// Comprobar %= o %
+					nC = nextChar();
+					if (nC == '=')
+					{
+						// Tomamos su id de la tabla
+						comp->id = MODEQUALS;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+					// No es doble operador (Solo un %)
+					else {
+						// Retroceder puntero una vez llega a caracter separador
+						returnPointer();
+						// Devuelve lexema entre punteros
+						comp->id = nC;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+				}
+				else if (nC == '~')
+				{
+					// Comprobar ~= o ~
+					nC = nextChar();
+					if (nC == '=')
+					{
+						// Tomamos su id de la tabla
+						comp->id = MULTEQUALS;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+					// No es doble operador (Solo un ~)
+					else {
+						// Retroceder puntero una vez llega a caracter separador
+						returnPointer();
+						// Devuelve lexema entre punteros
+						comp->id = nC;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+				}
+				else if (nC == '&')  
+				{
+					// Comprobar &= o && o &
+					nC = nextChar();
+					if (nC == '=')
+					{
+						// Tomamos su id de la tabla
+						comp->id = BITEQUALS;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+					else if (nC == '&')
+					{
+						// Tomamos su id de la tabla
+						comp->id = LOGAND;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+					// No es doble operador (Solo un &)
+					else {
+						// Retroceder puntero una vez llega a caracter separador
+						returnPointer();
+						// Devuelve lexema entre punteros
+						comp->id = nC;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+				}
+				else if (nC == '^')  
+				{
+					// Comprobar ^= o ^^= o ^
+					nC = nextChar();
+					if (nC == '^') // ^^
+					{
+						// Comprobar ^^= o ^^
+						nC = nextChar();
+						if (nC == '=') // ^^=
+						{
+							// Tomamos su id de la tabla
+							comp->id = BITEXEQUALS;
+							// Devuelve lexema entre punteros
+							getLex(comp);
+							// Aceptar cadena para guardar componente lexico
+							accept = 1;
+
+						}
+						else // ^^
+						{
+							// Retroceder puntero una vez llega a caracter separador
+							returnPointer();
+							// Tomamos su id de la tabla
+							comp->id = BITXOR;
+							// Devuelve lexema entre punteros
+							getLex(comp);
+							// Aceptar cadena para guardar componente lexico
+							accept = 1;
+						}
+					}
+					// No es doble operador (Solo un ^)
+					else {
+						// Retroceder puntero una vez llega a caracter separador
+						returnPointer();
+						// Devuelve lexema entre punteros
+						comp->id = nC;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+				}
+				else if (nC == '|')
+				{
+					// Comprobar |= o || o |
+					nC = nextChar();
+					if (nC == '=')
+					{
+						// Tomamos su id de la tabla
+						comp->id = BITINEQUALS;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+					else if (nC == '|')
+					{
+						// Tomamos su id de la tabla
+						comp->id = LOGOR;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+					// No es doble operador (Solo un |)
+					else {
+						// Retroceder puntero una vez llega a caracter separador
+						returnPointer();
+						// Devuelve lexema entre punteros
+						comp->id = nC;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+				}
+				else if (nC == '!')
+				{
+					// Comprobar != o !
+					nC = nextChar();
+					if (nC == '=')
+					{
+						// Tomamos su id de la tabla
+						comp->id = NOTEQUALS;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+					// No es doble operador (Solo un !)
+					else {
+						// Retroceder puntero una vez llega a caracter separador
+						returnPointer();
+						// Devuelve lexema entre punteros
+						comp->id = nC;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+				}
+				else if (nC == '<')
+				{
+					// Comprobar <= o <<= o <
+					nC = nextChar();
+					if (nC == '<') // <<
+					{
+						// Comprobar <<= o <<
+						nC = nextChar();
+						if (nC == '=') // <<=
+						{
+							// Tomamos su id de la tabla
+							comp->id = LSHIFTEQUALS;
+							// Devuelve lexema entre punteros
+							getLex(comp);
+							// Aceptar cadena para guardar componente lexico
+							accept = 1;
+							
+						}
+						else // <<
+						{
+							// Retroceder puntero una vez llega a caracter separador
+							returnPointer();
+							// Tomamos su id de la tabla
+							comp->id = BINLSHIFT;
+							// Devuelve lexema entre punteros
+							getLex(comp);
+							// Aceptar cadena para guardar componente lexico
+							accept = 1;
+						}
+					}
+					else if (nC == '=') // <=
+					{
+						// Tomamos su id de la tabla
+						comp->id = LESSEQUALS;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+
+					}
+					// No es doble operador (Solo un <)
+					else {
+						// Retroceder puntero una vez llega a caracter separador
+						returnPointer();
+						// Devuelve lexema entre punteros
+						comp->id = nC;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+				}
+				else if (nC == '>')
+				{
+					// Comprobar >= o >>= o >
+					nC = nextChar();
+					if (nC == '>') // >>
+					{
+						// Comprobar >>= o >>
+						nC = nextChar();
+						if (nC == '=') // >>=
+						{
+							// Tomamos su id de la tabla
+							comp->id = RSHIFTEQUALS;
+							// Devuelve lexema entre punteros
+							getLex(comp);
+							// Aceptar cadena para guardar componente lexico
+							accept = 1;
+
+						}
+						else if (nC == '=') // >=
+						{
+							// Tomamos su id de la tabla
+							comp->id = MOREEQUALS;
+							// Devuelve lexema entre punteros
+							getLex(comp);
+							// Aceptar cadena para guardar componente lexico
+							accept = 1;
+
+						}
+						else // >>
+						{
+							// Retroceder puntero una vez llega a caracter separador
+							returnPointer();
+							// Tomamos su id de la tabla
+							comp->id = BINRSHIFT;
+							// Devuelve lexema entre punteros
+							getLex(comp);
+							// Aceptar cadena para guardar componente lexico
+							accept = 1;
+						}
+					}
+					// No es doble operador (Solo un >)
+					else {
+						// Retroceder puntero una vez llega a caracter separador
+						returnPointer();
+						// Devuelve lexema entre punteros
+						comp->id = nC;
+						// Devuelve lexema entre punteros
+						getLex(comp);
+						// Aceptar cadena para guardar componente lexico
+						accept = 1;
+					}
+				}
 				break;
 			/*
 			* CASO Strings - Hacer igual que comentarios //
@@ -371,6 +730,7 @@ int nextLexComp(lexComp* comp) {
 				bool closeString;
 				closeString = 0;
 
+				// Recorrer string hasta que cierre
 				while (!closeString) 
 				{
 					// Avanzar en string
@@ -387,12 +747,19 @@ int nextLexComp(lexComp* comp) {
 					// Si es fin de string
 					else if (nC == '"') 
 					{
+						comp->id = DSTRING;
 						// Salimos del bucle
 						closeString = 1;
 					}
+					// No se cierra string salir del bucle
+					else if (nC == EOF) 
+					{
+						dCompError(ERR_UNCLOSED_STRING);
+						// Salir del bucle
+						closeString = 1;
+					}
 				}
-				// Tomamos su id de la tabla
-				comp->id = DSTRING;
+				
 				// Tomamos su lexema a partir del id
 				getLex(comp);
 				// Aceptar cadena para guardar componente lexico

@@ -151,3 +151,30 @@ unsigned treeIsMemberByLex(binTree A, lexCompKey cl) {
     //cl < A->info
     return treeIsMemberByLex(treeR(A), cl);
 }
+
+/*
+ * Funcion auxiliar recursiva de print de la tabla
+ */
+void _printTabla(binTree A){
+
+    if (!treeIsEmpty(A)) {
+        if (A->treeL != NULL) {
+            _printTabla(A->treeL);
+        }
+        printf("%20s %5d\n", A->info.lex, A->info.id);
+
+        if (A->treeR != NULL) {
+            _printTabla(A->treeR);
+        }
+    }
+
+}
+
+
+/**
+ * Imprime la tabla de simbolos
+ */
+void printTable(binTree A) {
+    printf("+++++++++++======SIMBOLOS======+++++++++++\n");
+    _printTabla(A);
+}

@@ -36,5 +36,5 @@ void syntaxAnalysis() {
 *   @param c: componente lexico a imprimir
 */
 void syntaxPrintLexComp(lexComp comp) {
-	printf("<%d,%s> \n", comp.id, comp.lex);
+	printf("<%7d,%25s> \n", comp.id, comp.lex);
 }
